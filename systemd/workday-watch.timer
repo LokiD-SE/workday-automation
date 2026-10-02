@@ -1,0 +1,10 @@
+[Unit]
+Description=Workday: ticket watcher every 30 min in work hours
+
+[Timer]
+OnCalendar=Mon..Sat *-*-* 09..20:00,30:00
+OnStartupSec=3min
+Persistent=false
+
+[Install]
+WantedBy=timers.target

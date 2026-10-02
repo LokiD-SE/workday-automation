@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Day Start
+Comment=VPN, local stack, emulators, Appium, Greybox, health check
+Exec=gnome-terminal --title="Day Start" -- bash -c '@HOME@/.local/bin/day start; echo; read -rp "Press Enter to close"'
+Icon=weather-clear
+Terminal=false
+Categories=Development;

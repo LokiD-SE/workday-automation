@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+"""day - workday automation CLI. `day help` for the commands."""
+
+import os
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+USAGE = """day start [--skip vpn,emulators,services,appium,greybox]   morning: stack, VPN, emulators, Appium, Greybox, health
+day end [--shutdown|--no-shutdown]      evening: git, daily report, stop everything, ask to shut down
+day status                              health table + timers
+day vpn up|down|status|setup            VPN (setup = save login in the keyring)
+day apk [--downgrade]                   install the newest downloaded Bizom APK on running emulators
+day watch [--show] [--no-git]           poll Zoho + repos now (--show: recent changes)
+day report [YYYY-MM-DD] [--print]       write today's (or that day's) status report
+day backup plan|run|setup               weekly Drive backup: dry run / run now / install rclone + remote
+day recorder                            run the run-recorder in the foreground
+gst [-f] [-a] [-q]                      status of every Workspace repo (-f fetch, -a + Greybox checkouts)
+gsync [repo...] [-m msg] [-y]           commit -> pull --rebase -> push (tests run in pre-push)"""
+
+
+def greybox_python() -> str:
+    from workday.config import CONFIG, expand
+    return str(expand(CONFIG["paths"]["greybox"]) / ".venv" / "bin" / "python")
+
+
+def main(argv: list[str]) -> int:
+    name = Path(sys.argv[0]).name
+    if name == "gst":
+        from workday import gitflow
+        return gitflow.gst_main(argv)
+    if name == "gsync":
+        from workday import gitflow
+        return gitflow.gsync_main(argv)
+    cmd, rest = (argv[0], argv[1:]) if argv else ("help", [])
+    if cmd == "start":
+        from workday import day
+        skip = set()
+        if "--skip" in rest:
+            skip = set(rest[rest.index("--skip") + 1].split(","))
+        return day.start(skip)
+    if cmd == "end":
+        from workday import day
+        choice = True if "--shutdown" in rest else False if "--no-shutdown" in rest else None
+        return day.end(choice)
+    if cmd == "status":
+        from workday import day
+        return day.status()
+    if cmd == "vpn":
+        from workday import vpn
+        sub = rest[0] if rest else "status"
+        if sub == "agent":
+            return vpn.agent_main()
+        if sub == "setup":
+            return vpn.setup_credentials()
+        if sub == "up":
+            ok, msg = vpn.up(wait=True)
+        elif sub == "down":
+            ok, msg = vpn.down()
+        else:
+            ok, msg = True, vpn.status_line()
+        print(msg)
+        return 0 if ok else 1
+    if cmd == "apk":
+        from workday import apk
+        print("\n".join(apk.process(downgrade="--downgrade" in rest, quiet="--quiet" in rest)))
+        return 0
+    if cmd == "watch":
+        if "--show" in rest:
+            from workday import watch
+            return watch.show()
+        python = greybox_python()
+        venv = os.path.dirname(os.path.dirname(python))
+        if os.path.realpath(sys.prefix) != os.path.realpath(venv) and os.path.exists(python):
+            os.execv(python, [python, str(ROOT / "bin" / "day"), "watch", *rest])
+        from workday import watch
+        return watch.main(rest)
+    if cmd == "report":
+        from datetime import date
+        from workday import report
+        days = [a for a in rest if not a.startswith("-")]
+        day = date.fromisoformat(days[0]) if days else date.today()
+        if "--print" in rest:
+            print(report.build(day))
+            return 0
+        path = report.write(day, copy="--no-copy" not in rest, announce="--quiet" not in rest)
+        print(path)
+        return 0
+    if cmd == "backup":
+        from workday import backup
+        sub = rest[0] if rest else "plan"
+        if sub == "setup":
+            return backup.setup()
+        if sub == "plan":
+            return backup.execute(dry_run=True)
+        if sub == "run":
+            return backup.execute()
+    if cmd == "recorder":
+        from workday import recorder
+        return recorder.main()
+    if cmd == "pre-push":
+        from workday import gitflow
+        return gitflow.pre_push_main()
+    print(USAGE)
+    return 0 if cmd in {"help", "-h", "--help"} else 2
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

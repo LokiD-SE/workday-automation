@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Day End
+Comment=Git, daily report, stop everything, shut down
+Exec=gnome-terminal --title="Day End" -- bash -c '@HOME@/.local/bin/day end; echo; read -rp "Press Enter to close"'
+Icon=weather-clear-night
+Terminal=false
+Categories=Development;

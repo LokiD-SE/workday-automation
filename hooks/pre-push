@@ -1,0 +1,4 @@
+#!/bin/sh
+# Installed by workday-automation/install.sh: run the repo's tests before every push.
+# Skip once with: SKIP_TESTS=1 git push   (or git push --no-verify)
+exec /usr/bin/python3 "$HOME/Workspace/workday-automation/bin/day" pre-push

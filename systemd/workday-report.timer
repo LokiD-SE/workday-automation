@@ -1,0 +1,8 @@
+[Unit]
+Description=Workday: daily status report at 18:30
+
+[Timer]
+OnCalendar=Mon..Sat *-*-* 18:30:00
+
+[Install]
+WantedBy=timers.target

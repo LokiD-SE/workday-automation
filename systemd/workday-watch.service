@@ -1,0 +1,8 @@
+[Unit]
+Description=Workday: Zoho tasks + ticket commits watcher (read-only)
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/Workspace/workday-automation/bin/day watch
+TimeoutStartSec=900

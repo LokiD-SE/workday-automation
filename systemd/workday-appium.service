@@ -1,0 +1,9 @@
+[Unit]
+Description=Workday: Appium server (Node 20.19.6 via nvm)
+
+[Service]
+ExecStartPre=-/usr/bin/fuser -k 4723/tcp
+ExecStart=/bin/bash -c 'export PATH="$HOME/.npm-global/bin:$PATH"; . "$HOME/.nvm/nvm.sh" >/dev/null && nvm use 20.19.6 >/dev/null && exec appium -p 4723'
+Environment=ANDROID_HOME=%h/Android/Sdk ANDROID_SDK_ROOT=%h/Android/Sdk
+Restart=on-failure
+RestartSec=5

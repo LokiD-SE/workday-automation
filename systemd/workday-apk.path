@@ -1,0 +1,9 @@
+[Unit]
+Description=Workday: watch ~/Downloads for new Bizom APKs
+
+[Path]
+PathChanged=%h/Downloads
+Unit=workday-apk.service
+
+[Install]
+WantedBy=default.target

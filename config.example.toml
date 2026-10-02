@@ -1,0 +1,18 @@
+# Overrides for workday-automation (defaults: workday/config.py). Uncomment what you change.
+
+# [emulators]
+# avds = ["Pixel_8", "Pixel_8_2"]
+
+# [apk]
+# smoke_command = ""            # e.g. "qa-run explore <ticket> -t 'app: Outlet'" after an install
+
+# [watch]
+# on_new_task = ""              # e.g. "qa-run generate {key}" - draft cases for every new task
+
+# [recorder]
+# record_screen = true
+# idle_minutes = 15
+
+# [backup]
+# remote = "gdrive:Bizom-QA-Backup"
+# stale_days = 14

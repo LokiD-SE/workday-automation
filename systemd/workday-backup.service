@@ -1,0 +1,10 @@
+[Unit]
+Description=Workday: weekly Google Drive backup + local clean-up
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/Workspace/workday-automation/bin/day backup run
+TimeoutStartSec=8h
+Nice=10
+IOSchedulingClass=idle

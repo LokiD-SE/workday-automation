@@ -1,0 +1,6 @@
+[Unit]
+Description=Workday: install a new Bizom APK on running emulators
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/Workspace/workday-automation/bin/day apk

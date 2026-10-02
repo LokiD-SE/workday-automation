@@ -1,0 +1,19 @@
+[Unit]
+Description=Bizom office VPN (OpenVPN, credentials + authenticator code from the desk user's workday agent)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# The socket directory is group-owned by the desk user (setgid) so the user-side agent can
+# connect; OpenVPN additionally checks the peer is that user.
+ExecStartPre=/usr/bin/install -d -m 2770 -o root -g @USER@ /run/bizom-vpn
+UMask=0007
+ExecStart=/usr/sbin/openvpn --suppress-timestamps --config /etc/openvpn/client/bizom.ovpn \
+    --management /run/bizom-vpn/mgmt.sock unix --management-client-user @USER@ \
+    --management-hold --management-query-passwords --auth-retry interact --auth-nocache
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,3 @@
+# Workday automation: password-less only for these exact commands (installed by install-root.sh).
+@USER@ ALL=(root) NOPASSWD: /usr/local/sbin/bizom-env start, /usr/local/sbin/bizom-env stop, /usr/local/sbin/bizom-env restart, /usr/local/sbin/bizom-env status
+@USER@ ALL=(root) NOPASSWD: /usr/bin/systemctl start bizom-vpn.service, /usr/bin/systemctl stop bizom-vpn.service, /usr/bin/systemctl restart bizom-vpn.service

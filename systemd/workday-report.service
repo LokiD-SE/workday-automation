@@ -1,0 +1,6 @@
+[Unit]
+Description=Workday: daily status report
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/Workspace/workday-automation/bin/day report

@@ -1,0 +1,11 @@
+[Unit]
+Description=Workday: logcat + rolling screen recording during active qa-run runs
+
+[Service]
+ExecStart=/usr/bin/python3 %h/Workspace/workday-automation/bin/day recorder
+Environment=PYTHONUNBUFFERED=1
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

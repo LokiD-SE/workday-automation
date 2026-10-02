@@ -1,0 +1,49 @@
+#!/bin/bash
+# Local Bizom web stack (mysql, php7.4-fpm, nginx) + CakePHP cache reset.
+# Installed root-owned to /usr/local/sbin by install-root.sh; sudoers lets the desk user run
+# exactly `bizom-env start|stop|restart|status` without a password. Takes no other input.
+set -u
+UNITS="mysql php7.4-fpm nginx"
+SITES="/var/sites/bizomsignup /var/sites/bizomweb2"
+
+clear_cache() {
+    for site in $SITES; do
+        rm -rf "$site/app/tmp/cache/models/"* "$site/app/tmp/cache/persistent/"* 2>/dev/null
+        chmod -R 0777 "$site/app/tmp" 2>/dev/null
+    done
+}
+
+stop_all() {
+    systemctl stop nginx php7.4-fpm mysql
+    # Same fallback as the old stop.sh, only when something is still holding on.
+    if pgrep -x nginx >/dev/null || pgrep -x mysqld >/dev/null || pgrep -f php-fpm7.4 >/dev/null; then
+        killall -9 nginx php-fpm7.4 mysqld 2>/dev/null
+        fuser -k 80/tcp 2>/dev/null
+    fi
+}
+
+status_all() {
+    for unit in $UNITS; do
+        printf '%-12s %s\n' "$unit" "$(systemctl is-active "$unit")"
+    done
+}
+
+case "${1:-}" in
+    start)
+        for unit in $UNITS; do systemctl is-active --quiet "$unit" || systemctl start "$unit"; done
+        clear_cache
+        status_all ;;
+    restart)
+        stop_all
+        for unit in $UNITS; do systemctl start "$unit"; done
+        clear_cache
+        status_all ;;
+    stop)
+        stop_all
+        status_all ;;
+    status)
+        status_all ;;
+    *)
+        echo "usage: bizom-env start|stop|restart|status" >&2
+        exit 2 ;;
+esac

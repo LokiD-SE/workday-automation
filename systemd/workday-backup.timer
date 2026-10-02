@@ -1,0 +1,10 @@
+[Unit]
+Description=Workday: weekly backup, Fridays 17:00 (catches up at next boot if missed)
+
+[Timer]
+OnCalendar=Fri *-*-* 17:00:00
+Persistent=true
+RandomizedDelaySec=5min
+
+[Install]
+WantedBy=timers.target
